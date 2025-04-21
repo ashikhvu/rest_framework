@@ -38,12 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app_drf',
-    'rest_framework'
+    'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
     ],
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
@@ -146,3 +148,27 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # how long access tokens are valid
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # how long refresh tokens are valid
+    'ROTATE_REFRESH_TOKENS': False,                 # whether to issue a new refresh token when refreshing
+    'BLACKLIST_AFTER_ROTATION': False,              # whether to blacklist old refresh tokens after rotation
+
+    'ALGORITHM': 'HS256',                           # JWT signing algorithm
+    'SIGNING_KEY': SECRET_KEY,                      # secret used to sign tokens
+    'VERIFYING_KEY': None,                          # used with RS256 (public key)
+    'AUTH_HEADER_TYPES': ('Bearer',),               # what to prefix the token with in headers
+    'USER_ID_FIELD': 'id',                          # field in user model to use as ID
+    'USER_ID_CLAIM': 'user_id',                     # claim in the token where the user ID is stored
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',               # claim name for token type
+
+    'JTI_CLAIM': 'jti',                             # JWT ID claim, for blacklisting
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',  # used with sliding tokens
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}

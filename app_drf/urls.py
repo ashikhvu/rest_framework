@@ -2,6 +2,6 @@ from django.urls import path,include
 from . import views
 
 urlpatterns = [
-    path('',views.index,name='index'),
-    path('api-auth',include('rest_framework.urls')),
+    path('user/token/',views.MyTokenObtainPiarView.as_view(),name='user_token'),
+    path('user/register/',views.RegisterView.as_view(),name='user_register'),
 ]

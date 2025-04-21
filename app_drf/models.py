@@ -1,15 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from shortuuid.django_fields import ShortUUIDField
+from django.dispatch import receiver
 from django.db.models.signals import post_save
 
 # Create your models here.
-class ProductModel(models.Model):
-    name = models.CharField(max_length=255,blank=True,null=True)
-    price = models.FloatField(blank=True,null=True)
-
-    def __str__(self):
-        return self.name
     
 class User(AbstractUser):
     username = models.CharField(max_length=255)
@@ -55,15 +50,27 @@ class ProfileModel(models.Model):
             self.full_name = self.user.full_name
         super(ProfileModel,self).save(*args,**kwargs)
 
+@receiver(post_save,sender=User)
 def create_user_profile(sender,instance,created,**kwargs):
     if created:
         ProfileModel.objects.create(
             user=instance
         )
 
+@receiver(post_save,sender=User)
 def save_user_profile(sender,instance,**kwargs):
     if hasattr(instance,'profile'):
         instance.profile.save()
 
-post_save.connect(create_user_profile,sender=User)
-post_save.connect(save_user_profile,sender=User)
+# def create_user_profile(sender,instance,created,**kwargs):
+#     if created:
+#         ProfileModel.objects.create(
+#             user=instance
+#         )
+
+# def save_user_profile(sender,instance,**kwargs):
+#     if hasattr(instance,'profile'):
+#         instance.profile.save()
+
+# post_save.connect(create_user_profile,sender=User)
+# post_save.connect(save_user_profile,sender=User)

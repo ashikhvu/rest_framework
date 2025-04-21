@@ -13,7 +13,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['username'] = user.username
 
         try:
-            token['vendor_id'] = user.vendor_id
+            token['vendor_id'] = user.vendor.id
         except:
             token['vendor_id'] = 0
 
@@ -44,7 +44,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ['full_name','email','phone','password','password2']
 
     def validate(self, attrs):
-        if self.password == self.password2:
+        if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError({"password":"Password doesn't match !"})
         return attrs
 
@@ -55,6 +55,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             phone=self.validated_data['phone'],
         )
         email_user,mobile = user.email.split('@')
-        user.set_password(validate_password['password'])
+        user.username = email_user
+        user.set_password(validated_data['password'])
         user.save()
         return user
